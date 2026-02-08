@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S S",
+    "SSS",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:cobblestone"
+    }
+  },
+  "result": {
+    "item": "rumble-port:stone_chestplate"
+  }
+}

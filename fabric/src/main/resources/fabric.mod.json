@@ -2,24 +2,24 @@
   "schemaVersion": 1,
   "id": "rumble-port",
   "version": "${version}",
-  "name": "Valkyrien Skies Addon Template",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Rumble Port",
+  "description": "Ports Rumble VR's Earthbending to Minecraft in VR and flatscreen with a few additions",
   "authors": [
-    "Me!"
+    "Omlettuce"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
     "sources": "https://github.com/FabricMC/fabric-example-mod"
   },
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/rumble-port/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.valkyrienskies.vs_template.fabric.VSTemplateModFabric"
+      "org.valkyrienskies.rumbleport.fabric.RumblePortFabric"
     ],
     "client": [
-      "org.valkyrienskies.vs_template.fabric.client.VSTemplateModFabricClient"
+      "org.valkyrienskies.rumbleport.fabric.client.RumblePortFabricClient"
     ]
   },
   "mixins": [

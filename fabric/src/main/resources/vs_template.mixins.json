@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "org.valkyrienskies.vs_template.fabric.mixin",
+  "package": "org.valkyrienskies.rumbleport.fabric.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],
