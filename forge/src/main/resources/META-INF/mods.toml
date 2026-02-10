@@ -4,7 +4,7 @@ loaderVersion = "[40,)"
 license = "Insert License Here"
 
 [[mods]]
-modId = "rumble-port"
+modId = "rumble_port"
 version = "${version}"
 displayName = "ROCK VR"
 authors = "Omlettuce"
@@ -13,28 +13,28 @@ Ports some gameplay elements from Buckethead Entertainment's RUMBLE to Minecraft
 '''
 logoFile = "icon.png"
 
-[[dependencies.rumble-port]]
+[[dependencies.rumble_port]]
 modId = "forge"
 mandatory = true
 versionRange = "[47,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.rumble-port]]
+[[dependencies.rumble_port]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.20.1,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.rumble-port]]
+[[dependencies.rumble_port]]
 modId = "architectury"
 mandatory = true
 versionRange = "[9.1.12,)"
 ordering = "AFTER"
 side = "BOTH"
 
-[[dependencies.rumble-port]]
+[[dependencies.rumble_port]]
 modId = "valkyrienskies"
 mandatory = true
 versionRange = "[2.4.0,)"

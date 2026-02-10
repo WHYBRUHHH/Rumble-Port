@@ -1,9 +1,9 @@
 {
   "replace": false,
   "values": [
-    "rumble-port:stone_helmet",
-    "rumble-port:stone_chestplate",
-    "rumble-port:stone_leggings",
-    "rumble-port:stone_boots"
+    "rumble_port:stone_helmet",
+    "rumble_port:stone_chestplate",
+    "rumble_port:stone_leggings",
+    "rumble_port:stone_boots"
   ]
 }

@@ -23,8 +23,9 @@ import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
 
 public final class RumblePortCommands {
     private static final double SHIP_SEARCH_RADIUS = 256.0D;
-    private static final double KICK_UPWARD_VELOCITY = 5.0D;
-    private static ServerShip closestShip = null;
+    private static final double KICK_VELOCITY = 5.0D;
+    private static final double STRAIGHT_VELOCITY = 5.0D;
+    private static ServerShip CLOSEST_SHIP = null;
 
     private RumblePortCommands() {
     }
@@ -46,7 +47,6 @@ public final class RumblePortCommands {
                         })
                 )
         );
-
         dispatcher.register(
             Commands.literal("ms")
                 .requires(source -> true)
@@ -54,7 +54,15 @@ public final class RumblePortCommands {
                     Commands.literal("kick")
                         .executes(context -> {
                             ServerPlayer player = context.getSource().getPlayerOrException();
-                            return straight(player) ? 1 : 0;
+                            return kick(player) ? 1 : 0;
+                        })
+                )
+                .then(
+                    Commands.literal("straight")
+                        .executes(context -> {
+                            ServerPlayer player = context.getSource().getPlayerOrException();
+                            straight(player);
+                            return 1;
                         })
                 )
         );
@@ -99,76 +107,49 @@ public final class RumblePortCommands {
     }
 
     private static boolean kick(ServerPlayer player) {
+        findStructure(player);
         ServerLevel world = player.serverLevel();
-        Vec3 playerPos = player.position();
-        AABB searchBox = new AABB(
-            playerPos.x - SHIP_SEARCH_RADIUS,
-            playerPos.y - SHIP_SEARCH_RADIUS,
-            playerPos.z - SHIP_SEARCH_RADIUS,
-            playerPos.x + SHIP_SEARCH_RADIUS,
-            playerPos.y + SHIP_SEARCH_RADIUS,
-            playerPos.z + SHIP_SEARCH_RADIUS
-        );
 
-        ServerShip closestShip = null;
-        double closestDistanceSq = Double.MAX_VALUE;
-
-        for (Ship ship : VSGameUtilsKt.getShipsIntersecting(world, searchBox)) {
-            if (!(ship instanceof ServerShip)) {
-                continue;
-            }
-            Vector3dc shipPos = ship.getTransform().getPositionInWorld();
-            double dx = shipPos.x() - playerPos.x;
-            double dy = shipPos.y() - playerPos.y;
-            double dz = shipPos.z() - playerPos.z;
-            double distSq = (dx * dx) + (dy * dy) + (dz * dz);
-            if (distSq < closestDistanceSq) {
-                closestDistanceSq = distSq;
-                closestShip = (ServerShip) ship;
-            }
-        }
-
-        if (closestShip == null) {
-            return false;
-        }
-
-        Vector3d newVelocity = new Vector3d(closestShip.getVelocity())
-            .add(0.0D, KICK_UPWARD_VELOCITY, 0.0D);
-        Vector3d angularVelocity = new Vector3d(closestShip.getAngularVelocity());
+        Vector3d newVelocity = new Vector3d(CLOSEST_SHIP.getVelocity())
+            .add(0.0D, KICK_VELOCITY, 0.0D);
+        Vector3d angularVelocity = new Vector3d(CLOSEST_SHIP.getAngularVelocity());
 
         ShipTeleportData teleportData = VSGameUtilsKt.getVsCore().newShipTeleportData(
-            closestShip.getTransform().getPositionInWorld(),
-            closestShip.getTransform().getShipToWorldRotation(),
+            CLOSEST_SHIP.getTransform().getPositionInWorld(),
+            CLOSEST_SHIP.getTransform().getShipToWorldRotation(),
             newVelocity,
             angularVelocity,
             VSGameUtilsKt.getDimensionId(world),
             null,
             null
         );
-        VSGameUtilsKt.getShipObjectWorld(world).teleportShip(closestShip, teleportData);
+        VSGameUtilsKt.getShipObjectWorld(world).teleportShip(CLOSEST_SHIP, teleportData);
         return true;
     }
 
-    private static boolean straight(ServerPlayer player) {
+    private static void straight(ServerPlayer player) {
         findStructure(player);
         ServerLevel world = player.serverLevel();
 
+        //Get player look direction
+        BlockPos base = player.blockPosition().above();
+        Vec3 look = player.getLookAngle().normalize();
+
         //Velocity
-        Vector3d newVelocity = new Vector3d(closestShip.getVelocity())
-                .add(0.0D, KICK_UPWARD_VELOCITY, 0.0D);
-        Vector3d angularVelocity = new Vector3d(closestShip.getAngularVelocity());
+        Vector3d newVelocity = new Vector3d(CLOSEST_SHIP.getVelocity())
+                .add(look.x * STRAIGHT_VELOCITY, 0.0D, look.z * STRAIGHT_VELOCITY);
+        Vector3d angularVelocity = new Vector3d(CLOSEST_SHIP.getAngularVelocity());
 
         ShipTeleportData teleportData = VSGameUtilsKt.getVsCore().newShipTeleportData(
-                closestShip.getTransform().getPositionInWorld(),
-                closestShip.getTransform().getShipToWorldRotation(),
+                CLOSEST_SHIP.getTransform().getPositionInWorld(),
+                CLOSEST_SHIP.getTransform().getShipToWorldRotation(),
                 newVelocity,
                 angularVelocity,
                 VSGameUtilsKt.getDimensionId(world),
                 null,
                 null
         );
-        VSGameUtilsKt.getShipObjectWorld(world).teleportShip(closestShip, teleportData);
-        return true;
+        VSGameUtilsKt.getShipObjectWorld(world).teleportShip(CLOSEST_SHIP, teleportData);
     }
 
     private static void findStructure(ServerPlayer player) {
@@ -196,7 +177,7 @@ public final class RumblePortCommands {
             double distSq = (dx * dx) + (dy * dy) + (dz * dz);
             if (distSq < closestDistanceSq) {
                 closestDistanceSq = distSq;
-                closestShip = (ServerShip) ship;
+                CLOSEST_SHIP = (ServerShip) ship;
             }
         }
     }
