@@ -25,6 +25,9 @@ public final class RumblePortCommands {
     private static final double SHIP_SEARCH_RADIUS = 256.0D;
     private static final double KICK_VELOCITY = 5.0D;
     private static final double STRAIGHT_VELOCITY = 5.0D;
+    private static final double UPPERCUT_FORWARD_VELOCITY = 3.0D;
+    private static final double UPPERCUT_UPWARD_VELOCITY = 3.0D;
+    private static final double UPPERCUT_ROTATIONAL_VELOCITY = 2.0D;
     private static ServerShip CLOSEST_SHIP = null;
 
     private RumblePortCommands() {
@@ -64,6 +67,14 @@ public final class RumblePortCommands {
                             straight(player);
                             return 1;
                         })
+                )
+                .then(
+                        Commands.literal("uppercut")
+                                .executes(context -> {
+                                    ServerPlayer player = context.getSource().getPlayerOrException();
+                                    uppercut(player);
+                                    return 1;
+                                })
                 )
         );
     }
@@ -140,6 +151,44 @@ public final class RumblePortCommands {
                 .add(look.x * STRAIGHT_VELOCITY, 0.0D, look.z * STRAIGHT_VELOCITY);
         Vector3d angularVelocity = new Vector3d(CLOSEST_SHIP.getAngularVelocity());
 
+        ShipTeleportData teleportData = VSGameUtilsKt.getVsCore().newShipTeleportData(
+                CLOSEST_SHIP.getTransform().getPositionInWorld(),
+                CLOSEST_SHIP.getTransform().getShipToWorldRotation(),
+                newVelocity,
+                angularVelocity,
+                VSGameUtilsKt.getDimensionId(world),
+                null,
+                null
+        );
+        VSGameUtilsKt.getShipObjectWorld(world).teleportShip(CLOSEST_SHIP, teleportData);
+    }
+
+    private static void uppercut(ServerPlayer player) {
+        findStructure(player);
+        ServerLevel world = player.serverLevel();
+
+        //Get player look direction
+        BlockPos base = player.blockPosition().above();
+        Vec3 look = player.getLookAngle().normalize();
+
+        //Calculate velocity
+        Vector3d newVelocity = new Vector3d(CLOSEST_SHIP.getVelocity())
+                .add(look.x * UPPERCUT_FORWARD_VELOCITY, UPPERCUT_UPWARD_VELOCITY, look.z * UPPERCUT_FORWARD_VELOCITY);
+        Vector3d lookDir = new Vector3d(look.x, look.y, look.z);
+        Vector3d rightAxis = new Vector3d(lookDir).cross(0.0D, 1.0D, 0.0D);
+        if (rightAxis.lengthSquared() < 1.0E-6D) {
+            rightAxis.set(1.0D, 0.0D, 0.0D);
+        } else {
+            rightAxis.normalize();
+        }
+        Vector3d angularVelocity = new Vector3d(CLOSEST_SHIP.getAngularVelocity())
+            .add(
+                rightAxis.x * UPPERCUT_ROTATIONAL_VELOCITY * -1,
+                rightAxis.y * UPPERCUT_ROTATIONAL_VELOCITY * -1,
+                rightAxis.z * UPPERCUT_ROTATIONAL_VELOCITY * -1
+            );
+
+        //Add velocity
         ShipTeleportData teleportData = VSGameUtilsKt.getVsCore().newShipTeleportData(
                 CLOSEST_SHIP.getTransform().getPositionInWorld(),
                 CLOSEST_SHIP.getTransform().getShipToWorldRotation(),
