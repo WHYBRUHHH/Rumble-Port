@@ -69,12 +69,19 @@ public final class RumblePortCommands {
                         })
                 )
                 .then(
-                        Commands.literal("uppercut")
-                                .executes(context -> {
-                                    ServerPlayer player = context.getSource().getPlayerOrException();
-                                    uppercut(player);
-                                    return 1;
-                                })
+                    Commands.literal("uppercut")
+                        .executes(context -> {
+                            ServerPlayer player = context.getSource().getPlayerOrException();
+                            uppercut(player);
+                            return 1;
+                        })
+                )
+                .then(
+                    Commands.literal("stomp")
+                        .executes(context -> {
+                            ServerPlayer player = context.getSource().getPlayerOrException();
+                            return stomp(player);
+                        })
                 )
         );
     }
@@ -119,6 +126,10 @@ public final class RumblePortCommands {
 
     private static boolean kick(ServerPlayer player) {
         findStructure(player);
+        if (CLOSEST_SHIP == null) {
+            return false;
+        }
+        GroundedShip.unground(CLOSEST_SHIP, player.getServer());
         ServerLevel world = player.serverLevel();
 
         Vector3d newVelocity = new Vector3d(CLOSEST_SHIP.getVelocity())
@@ -165,6 +176,10 @@ public final class RumblePortCommands {
 
     private static void uppercut(ServerPlayer player) {
         findStructure(player);
+        if (CLOSEST_SHIP == null) {
+            return;
+        }
+        GroundedShip.unground(CLOSEST_SHIP, player.getServer());
         ServerLevel world = player.serverLevel();
 
         //Get player look direction
@@ -199,6 +214,15 @@ public final class RumblePortCommands {
                 null
         );
         VSGameUtilsKt.getShipObjectWorld(world).teleportShip(CLOSEST_SHIP, teleportData);
+    }
+
+    private static int stomp(ServerPlayer player) {
+        findStructure(player);
+        if (CLOSEST_SHIP == null) {
+            return 0;
+        }
+        GroundedShip.ground(CLOSEST_SHIP);
+        return 1;
     }
 
     private static void findStructure(ServerPlayer player) {

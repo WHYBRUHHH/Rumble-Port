@@ -3,6 +3,7 @@ package org.valkyrienskies.rumbleport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.valkyrienskies.rumbleport.item.ModItems;
+import org.valkyrienskies.rumbleport.server.GroundedShip;
 import org.valkyrienskies.rumbleport.server.RumblePortCommands;
 
 /**
@@ -18,6 +19,7 @@ public final class RumblePortMod {
     public static void init() {
         ModItems.register();
         RumblePortCommands.register();
+        GroundedShip.register();
         LOGGER.info("Rumble Port Initialised");
     }
 }
